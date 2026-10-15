@@ -27,3 +27,10 @@ The trade-off is deliberate: the delimiter is the tab character only. There is n
 A quote character (`"`) appearing in the middle of an *unquoted* field is rejected with a `TsvError` rather than silently absorbed. If your data has stray quotes in unquoted fields, you'll need to clean them before parsing. This strictness is intentional: silently guessing what the producer meant is how corrupted data hides.
 
 Also note: a single trailing newline on input is stripped (so `"a\tb\n"` parses to one row, not two). This matches typical command-line tool behaviour and avoids phantom empty rows from newline-terminated files.
+
+## Performance
+
+The window keeps a bounded buffer, so `push` is constant time and memory does not
+grow with the length of the stream. `peak` and `trough` are linear in the window
+size, which is the trade that keeps `push` cheap.
+
